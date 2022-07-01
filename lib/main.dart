@@ -12,6 +12,7 @@ void main() {
     statusBarIconBrightness: Brightness.light, // For Android (dark icons)
     statusBarBrightness: Brightness.light,
   ));
+
   runApp( MaterialApp(
       navigatorKey: navigatorKey,
      // theme: ThemeData(fontFamily: "Nunito"),

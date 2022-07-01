@@ -31,8 +31,15 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   var filterdata;
   var snackBar;
   var projectdata;
+  var currentmnthdata;
+  var currentweekdata;
+  var currenttaskdata;
+  var taskdata;
   bool dateclick=false;
+  int filterid=0;
   List<String> filterenum = ["This week", "Next week", "Today", "Tomorrow"];
+  List<int> filterenumid = [1, 2, 3, 4];
+
   DateTime currentDate = DateTime.now();
   // final now = DateTime.now();
   // final today = DateTime(now.year, now.month, now.day);
@@ -44,11 +51,12 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         initialDate: currentDate,
         firstDate: DateTime(2015),
         lastDate: DateTime(2050));
-    if (pickedDate != null && pickedDate != currentDate)
+    if (pickedDate != null && pickedDate != currentDate) {
       setState(() {
         dateclick=true;
         currentDate = pickedDate;
       });
+    }
 // Text("${strDigits(currentDate.day)}-${strDigits(currentDate.month)}-${strDigits(currentDate.year)}"),
 //
   }
@@ -58,8 +66,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       content: Container(
           child: Text(
-            "${text}",
-            style: TextStyle(color: Colors.black, fontSize: 18),
+            text,
+            style: const TextStyle(color: Colors.black, fontSize: 18),
             textAlign: TextAlign.center,
           )),
       actions: [
@@ -67,7 +75,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             onPressed: () {
               Navigator.pop(context);
             },
-            child: Text("OK"))
+            child: const Text("OK"))
       ],
     );
     showDialog(
@@ -84,7 +92,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     super.initState();
 
     WidgetsBinding.instance.addObserver(this);
-    getCountry();
+    getEmployee();
+   // getcurrentmonth("8");
     //userdata();
   }
 
@@ -127,7 +136,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     {"Date": "30 july", "Task": "2", "Number": "2"}
   ];
 
-  void getCountry() async {
+  void getEmployee() async {
     http.Response response =
     await http.get(Uri.parse('${StringConstants.BASE_URL}getEmployee'));
     var jsonResponse = convert.jsonDecode(response.body);
@@ -140,16 +149,10 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
           jsonDecode(datacoun!);
         });
         //getState(GetStateResponse);
-        var venam = jsonDecode(datacoun!)[0]['emp_name'].toString();
-        var venamid = jsonDecode(datacoun!)[0]['id'].toString();
-        if (kDebugMode) {
-          print(venam);
-        }
-
-        if (kDebugMode) {
-          print(venamid);
-        }
-        log(jsonDecode(datacoun!)[0]['department']['department_name'].toString());
+        // var venam = jsonDecode(datacoun!)[0]['emp_name'].toString();
+        // var venamid = jsonDecode(datacoun!)[0]['id'].toString();
+       log(jsonDecode(datacoun!).toString());
+        log(jsonDecode(datacoun!)['data'][0]['department']['department_name'].toString());
       } else {}
     } else {
       if (kDebugMode) {
@@ -175,6 +178,160 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         log(jsonDecode(projectdata!)[0]['description'].toString());
         log(jsonDecode(projectdata!)[0]['state'].toString());
       } else {}
+    } else {
+      if (kDebugMode) {
+        print(response.statusCode);
+      }
+    }
+  }
+  void getcurrentmonth(String empid) async {
+    log("getcurrentmnthapi");
+    http.Response response =
+    await http.get(Uri.parse('${StringConstants.BASE_URL}getEmployeeCurrentMonthTask/$empid'));
+    var jsonResponse = convert.jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      currentmnthdata = response.body;
+      if (jsonResponse['status'] == 200) {
+        setState(() {
+          currentmnthdata = response.body;
+
+          jsonDecode(currentmnthdata!);
+        });
+
+        log(jsonDecode(currentmnthdata!).toString());
+        log(jsonDecode(currentmnthdata!)['data'][0]['id'].toString());
+        log(jsonDecode(currentmnthdata!)['data'][0]['sub_task_id'].toString());
+        log(jsonDecode(currentmnthdata!)['data'][0]['employee_id'].toString());
+        log(jsonDecode(currentmnthdata!)['data'][0]['description'].toString());
+        log(jsonDecode(currentmnthdata!)['data'][0]['state'].toString());
+        log(jsonDecode(currentmnthdata!)['data'][0]['created_at'].toString());
+        log(jsonDecode(currentmnthdata!)['data'][0]['updated_at'].toString());
+        log(jsonDecode(currentmnthdata!)['data'][0]['star_date'].toString());
+        log(jsonDecode(currentmnthdata!)['data'][0]['end_date'].toString());
+      } else {
+        snackBar = SnackBar(
+          content: Text(
+              jsonResponse['message']),
+        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(snackBar);
+      }
+    } else {
+      if (kDebugMode) {
+        print(response.statusCode);
+      }
+    }
+  }
+  void getcurrentweek(String empid) async {
+    log("getcurrentweekapi");
+    http.Response response =
+    await http.get(Uri.parse('${StringConstants.BASE_URL}getEmployeeCurrentWeekTask/$empid'));
+    var jsonResponse = convert.jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      currentweekdata = response.body;
+      if (jsonResponse['status'] == 200) {
+        setState(() {
+          currentweekdata = response.body;
+
+          jsonDecode(currentweekdata!);
+        });
+
+        log(jsonDecode(currentweekdata!).toString());
+        log(jsonDecode(currentweekdata!)['data'][0]['id'].toString());
+        log(jsonDecode(currentweekdata!)['data'][0]['sub_task_id'].toString());
+        log(jsonDecode(currentweekdata!)['data'][0]['employee_id'].toString());
+        log(jsonDecode(currentweekdata!)['data'][0]['description'].toString());
+        log(jsonDecode(currentweekdata!)['data'][0]['state'].toString());
+        log(jsonDecode(currentweekdata!)['data'][0]['created_at'].toString());
+        log(jsonDecode(currentweekdata!)['data'][0]['updated_at'].toString());
+        log(jsonDecode(currentweekdata!)['data'][0]['star_date'].toString());
+        log(jsonDecode(currentweekdata!)['data'][0]['end_date'].toString());
+      } else {
+        snackBar = SnackBar(
+          content: Text(
+              jsonResponse['message']),
+        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(snackBar);
+      }
+    } else {
+      if (kDebugMode) {
+        print(response.statusCode);
+      }
+    }
+  }
+  void getcurrenttask(String empid) async {
+    log("getcurrenttaskapi");
+    http.Response response =
+    await http.get(Uri.parse('${StringConstants.BASE_URL}getEmployeeTodayTask/$empid'));
+    var jsonResponse = convert.jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      currenttaskdata = response.body;
+      if (jsonResponse['status'] == 200) {
+        setState(() {
+          currenttaskdata = response.body;
+
+          jsonDecode(currenttaskdata!);
+        });
+
+        log(jsonDecode(currenttaskdata!).toString());
+        log(jsonDecode(currenttaskdata!)['data'][0]['id'].toString());
+        log(jsonDecode(currenttaskdata!)['data'][0]['sub_task_id'].toString());
+        log(jsonDecode(currenttaskdata!)['data'][0]['employee_id'].toString());
+        log(jsonDecode(currenttaskdata!)['data'][0]['description'].toString());
+        log(jsonDecode(currenttaskdata!)['data'][0]['state'].toString());
+        log(jsonDecode(currenttaskdata!)['data'][0]['created_at'].toString());
+        log(jsonDecode(currenttaskdata!)['data'][0]['updated_at'].toString());
+        log(jsonDecode(currenttaskdata!)['data'][0]['star_date'].toString());
+        log(jsonDecode(currenttaskdata!)['data'][0]['end_date'].toString());
+      } else {
+        snackBar = SnackBar(
+          content: Text(
+              jsonResponse['message']),
+        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(snackBar);
+      }
+    } else {
+      if (kDebugMode) {
+        print(response.statusCode);
+      }
+    }
+  }
+  void gettask(String empid) async {
+    log("gettaskapi");
+    http.Response response =
+    await http.get(Uri.parse('${StringConstants.BASE_URL}getTask/$empid'));
+    var jsonResponse = convert.jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      taskdata = response.body;
+      if (jsonResponse['status'] == 200) {
+        setState(() {
+          taskdata = response.body;
+
+          jsonDecode(taskdata!);
+        });
+
+        log(jsonDecode(taskdata!).toString());
+        log(jsonDecode(taskdata!)['data'][0]['id'].toString());
+        log(jsonDecode(taskdata!)['data'][0]['project_id'].toString());
+        log(jsonDecode(taskdata!)['data'][0]['task_name'].toString());
+        log(jsonDecode(taskdata!)['data'][0]['description'].toString());
+        log(jsonDecode(taskdata!)['data'][0]['project_name'].toString());
+        log(jsonDecode(taskdata!)['data'][0]['project']['id'].toString());
+        log(jsonDecode(taskdata!)['data'][0]['project']['project_name'].toString());
+        log(jsonDecode(taskdata!)['data'][0]['project']['description'].toString());
+        log(jsonDecode(taskdata!)['data'][0]['project']['state'].toString());
+        log(jsonDecode(taskdata!)['data'][0]['project']['created_at'].toString());
+        log(jsonDecode(taskdata!)['data'][0]['project']['updated_at'].toString());
+      } else {
+        snackBar = SnackBar(
+          content: Text(
+              jsonResponse['message']),
+        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(snackBar);
+      }
     } else {
       if (kDebugMode) {
         print(response.statusCode);
@@ -251,7 +408,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             Align(
               alignment: Alignment.topLeft,
               child: Container(
-                padding: EdgeInsets.all(8),
+                padding: const EdgeInsets.all(8),
                 color: Colors.teal.shade100,
                 // alignment: Alignment.topCenter,
                 height: 100,
@@ -300,8 +457,23 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                                 onTap: () {
                                                   setState(() {
                                                     filtername = filterenum[index];
+                                                    filterid = filterenumid[index];
+
+                                                    if(staffid!=null){
+                                                      if(filterid==0){
+                                                        getcurrentmonth(
+                                                            "$staffid");
+                                                      }else if(filterid==1){
+                                                        getcurrentweek(
+                                                            "$staffid");
+                                                      }else if(filterid==3){
+                                                        getcurrenttask("$staffid");
+                                                      }
+                                                    }
                                                     Navigator.pop(context);
+
                                                   });
+
                                                 },
                                                 child: Text(
                                                   filterenum[index],
@@ -324,15 +496,15 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                   builder: (BuildContext context) => errorDialog);
                             },
                             child: SizedBox(
-                                width: (MediaQuery.of(context).size.width - 20) *2/ 7,
+                                width: (MediaQuery.of(context).size.width - 20) *3/ 7,
                                 child: Center(
                                   child: Align(
                                       alignment: Alignment.center,
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                         children: [
-                                          Padding(
-                                              padding: const EdgeInsets.all(2),
+                                          const Padding(
+                                              padding: EdgeInsets.all(2),
                                               child: Text("Filter",style: TextStyle(fontSize: 18),)),
                                           Container(
                                               width: 24,
@@ -356,41 +528,45 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                   ),
                                 )),
                           ),
-                          GestureDetector(
-                            onTap: (){
-                              //       if(staffid!=null){
-                              //
-                              //       }else{
-                              //         snackBar = SnackBar(
-                              //           content: Text("Please select staff"),
-                              //         );
-                              //         ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                              //       }
-                            },
-                            child: Container(
-                              width: (MediaQuery.of(context).size.width - 20) / 7,
-                              child: Align(
-                                alignment: Alignment.centerRight,
-                                child: Container(
-                                  width: 24,
-                                  height: 24,
-                                  decoration: BoxDecoration(
-                                      color: Colors.teal.shade100,
-                                      border: Border.all(
-                                        color: Colors.grey,
-                                      ),
-                                      borderRadius: BorderRadius.circular(5)),
-
-                                  child: Center(
-                                    child: Image.asset(
-                                      "assets/images/right_arrow.png",height: 20,width: 20,
-
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
+                          // GestureDetector(
+                          //   onTap: (){
+                          //           // if(staffid!=null){
+                          //           //   if(filterid==0){
+                          //           //     getcurrentmonth();
+                          //           //   }else if(filterid==1){
+                          //           //     getcurrentweek(staffid);
+                          //           //   }
+                          //           // }else{
+                          //           //   snackBar = SnackBar(
+                          //           //     content: Text("Please select staff"),
+                          //           //   );
+                          //           //   ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                          //           // }
+                          //   },
+                          //   child: Container(
+                          //     width: (MediaQuery.of(context).size.width - 20) / 7,
+                          //     child: Align(
+                          //       alignment: Alignment.centerRight,
+                          //       child: Container(
+                          //         width: 24,
+                          //         height: 24,
+                          //         decoration: BoxDecoration(
+                          //             color: Colors.teal.shade100,
+                          //             border: Border.all(
+                          //               color: Colors.grey,
+                          //             ),
+                          //             borderRadius: BorderRadius.circular(5)),
+                          //
+                          //         child: Center(
+                          //           child: Image.asset(
+                          //             "assets/images/right_arrow.png",height: 20,width: 20,
+                          //
+                          //           ),
+                          //         ),
+                          //       ),
+                          //     ),
+                          //   ),
+                          // ),
 
                         ],
                       ),
@@ -435,14 +611,34 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 ),
               ),
             ),
-            Container(
-              alignment: Alignment(0,100),
-              margin: const EdgeInsets.fromLTRB(10, 100, 10, 10),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: datatable(context),
-              ),
-            ),
+            if(filterid==0)
+              datatable(context,currentmnthdata),
+
+            if(filterid==1)
+              datatable(context,currentweekdata),
+
+            if(filterid==3)
+              datatable(context,currenttaskdata),
+
+          // if(filterid==0)
+          //     currentmnth(),
+          //
+          //  if(filterid==1)
+          //  currentweek(),
+          //
+          //   if(filterid==3)
+          //     currenttask()
+
+
+
+            // Container(
+            //   alignment: Alignment(0,100),
+            //   margin: const EdgeInsets.fromLTRB(10, 100, 10, 10),
+            //   child: SingleChildScrollView(
+            //     scrollDirection: Axis.vertical,
+            //     child: datatable(context),
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -477,7 +673,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       physics: const ClampingScrollPhysics(
                           parent: BouncingScrollPhysics()),
                       shrinkWrap: true,
-                      itemCount: jsonDecode(datacoun!).length,
+                      itemCount: jsonDecode(datacoun!)['data']!.length,
                       itemBuilder: (BuildContext context, int index) {
                         return Column(
                           children: [
@@ -490,11 +686,15 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                 onTap: () {
                                   setState(() {
                                     staffname =
-                                        jsonDecode(datacoun!)[index]['emp_name']
+                                        jsonDecode(datacoun!)['data'][index]['emp_name']
                                             .toString();
-                                    staffid = jsonDecode(datacoun!)[index]['id']
+                                    staffid = jsonDecode(datacoun!)['data'][index]['id']
                                         .toString();
-
+                                    if(filterid==0) {
+                                      getcurrentmonth("$staffid");
+                                    }else if(filterid==1){
+                                      getcurrentweek("$staffid");
+                                    }
                                     if (kDebugMode) {
                                       print(staffid);
                                     }
@@ -502,7 +702,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                   });
                                 },
                                 child: Text(
-                                  "${jsonDecode(datacoun!)[index]['emp_name']}\n(${jsonDecode(datacoun!)[index]['department_name']})"
+                                  "${jsonDecode(datacoun!)['data'][index]['emp_name']}\n(${jsonDecode(datacoun!)['data'][index]['department_name']})"
                                       ,
                                   style: const TextStyle(
                                       fontSize: 14, color: Colors.black,),textAlign: TextAlign.start,
@@ -546,62 +746,444 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         ));
   }
 
-  Widget filtertime(BuildContext context) {
-    return Container(
-        margin: const EdgeInsets.fromLTRB(0, 0, 0, 20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            const Text(
-              "From",
-              style: TextStyle(fontSize: 18, color: Colors.black),
-            ),
-            SizedBox(
-              width: 100,
-              child: TextFormField(
-                controller: fromcontroller,
-                onChanged: (value) {},
-                maxLength: 7,
-              ),
-            ),
-            const Text(
-              "To",
-              style: TextStyle(fontSize: 18, color: Colors.black),
-            ),
-            SizedBox(
-              width: 100,
-              child: TextFormField(
-                controller: tocontroller,
-                onChanged: (value) {},
-                maxLength: 7,
-              ),
-            ),
-            GestureDetector(
-              onTap: () {},
-              child: Align(
-                  alignment: Alignment.centerRight,
-                  child: Container(
-                      width: 24,
-                      height: 24,
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(
-                            color: Colors.grey,
+
+  Widget currentmnth(){
+    return currentmnthdata==null?Container(
+
+      margin:  const EdgeInsets.fromLTRB(10, 100, 10, 10)
+    ):jsonDecode(currentmnthdata!)['data']==null?Container(
+    ): Container(
+        // alignment: Alignment(0,100),
+         margin:  const EdgeInsets.fromLTRB(10, 100, 10, 10),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          children: <Widget>[
+
+            Container(
+              child: ListView.builder(
+                  physics:
+                  const ClampingScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: jsonDecode(currentmnthdata!)['data']!.length,
+                  itemBuilder: (BuildContext context,
+                      int index) {
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Column(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.teal,
+                              border: Border.all(
+                                color: Colors.black,
+                              ),
+                            ),
+                            //borderRadius: BorderRadius.circular(5)),
+                            height: 52,
+                            child: Row(
+
+                              children: [
+                                Column(
+                                  children: [
+                                    Container(width: 100,  height: 50,  padding: const EdgeInsets.all(8),
+
+                                        child: const Center(child: Text("Date",style: TextStyle(color: Colors.white),))),
+                                  ],
+                                ),
+                                const VerticalDivider(
+                                  color: Colors.black,
+                                ),
+                                Column(
+                                  children: [
+                                    Container(width: 150,  height: 50,  padding: const EdgeInsets.all(8),
+                                        child: const Center(child: Text("Task",style: TextStyle(color: Colors.white)))),
+                                  ],
+                                ),
+                                const VerticalDivider(
+                                  color: Colors.black,
+                                ),
+                                // Column(
+                                //   children: [
+                                //     Container(width: 100,  height: 50,  padding: const EdgeInsets.all(8),
+                                //         child: const Center(child: Text("Time",style: TextStyle(color: Colors.white)))),
+                                //
+                                //   ],
+                                // ),
+                                const VerticalDivider(
+                                  color: Colors.black,
+                                ),
+                                Column(
+                                  children: [
+                                    Container(width: 100,
+                                        height: 50,
+                                        padding: const EdgeInsets.all(8),
+                                        child: const Center(child: Text("Status",style: TextStyle(color: Colors.white)))),
+                                  ],
+                                ),
+
+                              ],
+                            ),
                           ),
-                          borderRadius: BorderRadius.circular(5)),
-                      child: Image.asset(
-                        "assets/images/filter.png",
-                        height: 30,
-                        color: Colors.grey,
-                      ))),
+                          Container(
+                            decoration: BoxDecoration(
+
+                              border: Border.all(
+                                color: Colors.black,
+                              ),
+                            ),
+                            child: Row(
+
+                              children: [
+                                Column(
+                                  children: [
+
+                                    Container(width: 100,  padding: const EdgeInsets.all(8),
+                                        child: Text("${jsonDecode(currentmnthdata!)['data'][index]['star_date'].toString()}\n-\n${jsonDecode(currentmnthdata!)['data'][index]['end_date'].toString()}")),
+
+                                  ],
+                                ),
+                                const VerticalDivider(
+                                  color: Colors.black,
+                                ),
+                                Column(
+                                  children: [
+
+                                    Container(width: 150,  padding: const EdgeInsets.all(8),
+                                        child: Text(jsonDecode(currentmnthdata!)['data'][index]['description'].toString())),
+                                  ],
+                                ),
+                                // const VerticalDivider(
+                                //   color: Colors.black,
+                                // ),
+                                // Column(
+                                //   children: [
+                                //
+                                //     Container(width: 100,  padding: const EdgeInsets.all(8),
+                                //         child: Text("${jsonDecode(currentmnthdata!)['data'][index]['star_date'].toString()}\n-\n${jsonDecode(currentmnthdata!)['data'][index]['end_date'].toString()}")),
+                                //
+                                //   ],
+                                // ),
+                                const VerticalDivider(
+                                  color: Colors.black,
+                                ),
+                                Column(
+                                  children: [
+
+                                    Container(width: 100,  padding: const EdgeInsets.all(8),
+                                        child: Text(jsonDecode(currentmnthdata!)['data'][index]['state'].toString())),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+              ),
             ),
+
           ],
-        ));
+        ),
+      ),
+    );
   }
 
-  Widget datatable(BuildContext context) {
-    return SingleChildScrollView(
+  Widget currentweek(){
+    return currentweekdata==null?Container(
+
+        margin:  const EdgeInsets.fromLTRB(10, 100, 10, 10)
+    ):jsonDecode(currentweekdata!)['data']==null?Container(
+    ): Container(
+      // alignment: Alignment(0,100),
+      margin:  const EdgeInsets.fromLTRB(10, 100, 10, 10),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          children: <Widget>[
+
+            Container(
+              child: ListView.builder(
+                  physics:
+                  const ClampingScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: jsonDecode(currentweekdata!)['data']!.length,
+                  itemBuilder: (BuildContext context,
+                      int index) {
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Column(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.teal,
+                              border: Border.all(
+                                color: Colors.black,
+                              ),
+                            ),
+                            //borderRadius: BorderRadius.circular(5)),
+                            height: 52,
+                            child: Row(
+
+                              children: [
+                                Column(
+                                  children: [
+                                    Container(width: 100,  height: 50,  padding: const EdgeInsets.all(8),
+
+                                        child: const Center(child: Text("Date",style: TextStyle(color: Colors.white),))),
+                                  ],
+                                ),
+                                const VerticalDivider(
+                                  color: Colors.black,
+                                ),
+                                Column(
+                                  children: [
+                                    Container(width: 150,  height: 50,  padding: const EdgeInsets.all(8),
+                                        child: const Center(child: Text("Task",style: TextStyle(color: Colors.white)))),
+                                  ],
+                                ),
+                                const VerticalDivider(
+                                  color: Colors.black,
+                                ),
+                                // Column(
+                                //   children: [
+                                //     Container(width: 100,  height: 50,  padding: const EdgeInsets.all(8),
+                                //         child: const Center(child: Text("Time",style: TextStyle(color: Colors.white)))),
+                                //
+                                //   ],
+                                // ),
+                                const VerticalDivider(
+                                  color: Colors.black,
+                                ),
+                                Column(
+                                  children: [
+                                    Container(width: 100,
+                                        height: 50,
+                                        padding: const EdgeInsets.all(8),
+                                        child: const Center(child: Text("Status",style: TextStyle(color: Colors.white)))),
+                                  ],
+                                ),
+
+                              ],
+                            ),
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+
+                              border: Border.all(
+                                color: Colors.black,
+                              ),
+                            ),
+                            child: Row(
+
+                              children: [
+                                Column(
+                                  children: [
+
+                                    Container(width: 100,  padding: const EdgeInsets.all(8),
+                                        child: Text("${jsonDecode(currentweekdata!)['data'][index]['star_date'].toString()}\n-\n${jsonDecode(currentmnthdata!)['data'][index]['end_date'].toString()}")),
+
+                                  ],
+                                ),
+                                const VerticalDivider(
+                                  color: Colors.black,
+                                ),
+                                Column(
+                                  children: [
+
+                                    Container(width: 150,  padding: const EdgeInsets.all(8),
+                                        child: Text(jsonDecode(currentweekdata!)['data'][index]['description'].toString())),
+                                  ],
+                                ),
+                                // const VerticalDivider(
+                                //   color: Colors.black,
+                                // ),
+                                // Column(
+                                //   children: [
+                                //
+                                //     Container(width: 100,  padding: const EdgeInsets.all(8),
+                                //         child: Text("${jsonDecode(currentweekdata!)['data'][index]['star_date'].toString()}\n-\n${jsonDecode(currentmnthdata!)['data'][index]['end_date'].toString()}")),
+                                //
+                                //   ],
+                                // ),
+                                const VerticalDivider(
+                                  color: Colors.black,
+                                ),
+                                Column(
+                                  children: [
+
+                                    Container(width: 100,  padding: const EdgeInsets.all(8),
+                                        child: Text(jsonDecode(currentweekdata!)['data'][index]['state'].toString())),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+              ),
+            ),
+
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget currenttask(){
+    return currenttaskdata==null?Container(
+
+        margin:  const EdgeInsets.fromLTRB(10, 100, 10, 10)
+    ):jsonDecode(currenttaskdata!)['data']==null?Container(
+    ): Container(
+      // alignment: Alignment(0,100),
+      margin:  const EdgeInsets.fromLTRB(10, 100, 10, 10),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          children: <Widget>[
+
+            ListView.builder(
+                physics:
+                const ClampingScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: jsonDecode(currenttaskdata!)['data']!.length,
+                itemBuilder: (BuildContext context,
+                    int index) {
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Column(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.teal,
+                            border: Border.all(
+                              color: Colors.black,
+                            ),
+                          ),
+                          //borderRadius: BorderRadius.circular(5)),
+                          height: 52,
+                          child: Row(
+
+                            children: [
+                              Column(
+                                children: [
+                                  Container(width: 100,  height: 50,  padding: const EdgeInsets.all(8),
+
+                                      child: const Center(child: Text("Date",style: TextStyle(color: Colors.white),))),
+                                ],
+                              ),
+                              const VerticalDivider(
+                                color: Colors.black,
+                              ),
+                              Column(
+                                children: [
+                                  Container(width: 150,  height: 50,  padding: const EdgeInsets.all(8),
+                                      child: const Center(child: Text("Task",style: TextStyle(color: Colors.white)))),
+                                ],
+                              ),
+                              // const VerticalDivider(
+                              //   color: Colors.black,
+                              // ),
+                              // Column(
+                              //   children: [
+                              //     Container(width: 100,  height: 50,  padding: const EdgeInsets.all(8),
+                              //         child: const Center(child: Text("Time",style: TextStyle(color: Colors.white)))),
+                              //
+                              //   ],
+                              // ),
+                              const VerticalDivider(
+                                color: Colors.black,
+                              ),
+                              Column(
+                                children: [
+                                  Container(width: 100,
+                                      height: 50,
+                                      padding: const EdgeInsets.all(8),
+                                      child: const Center(child: Text("Status",style: TextStyle(color: Colors.white)))),
+                                ],
+                              ),
+
+                            ],
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+
+                            border: Border.all(
+                              color: Colors.black,
+                            ),
+                          ),
+                          child: Row(
+
+                            children: [
+                              Column(
+                                children: [
+
+                                  Container(width: 100,  padding: const EdgeInsets.all(8),
+                                      child: Text("${jsonDecode(currenttaskdata!)['data'][index]['star_date'].toString()}\n-\n${jsonDecode(currentmnthdata!)['data'][index]['end_date'].toString()}")),
+
+                                ],
+                              ),
+                              const VerticalDivider(
+                                color: Colors.black,
+                              ),
+                              Column(
+                                children: [
+
+                                  Container(width: 150,  padding: const EdgeInsets.all(8),
+                                      child: Text(jsonDecode(currenttaskdata!)['data'][index]['description'].toString())),
+                                ],
+                              ),
+                              // const VerticalDivider(
+                              //   color: Colors.black,
+                              // ),
+                              // Column(
+                              //   children: [
+                              //
+                              //     Container(width: 100,  padding: const EdgeInsets.all(8),
+                              //         child: Text("${jsonDecode(currenttaskdata!)['data'][index]['star_date'].toString()}\n-\n${jsonDecode(currentmnthdata!)['data'][index]['end_date'].toString()}")),
+                              //
+                              //   ],
+                              // ),
+                              const VerticalDivider(
+                                color: Colors.black,
+                              ),
+                              Column(
+                                children: [
+
+                                  Container(width: 100,  padding: const EdgeInsets.all(8),
+                                      child: Text(jsonDecode(currenttaskdata!)['data'][index]['state'].toString())),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+            ),
+
+          ],
+        ),
+      ),
+    );
+  }
+  List newtable=[].toList(growable: true);
+Widget datatable(BuildContext context,data1) {
+  if(data1!=null) {
+    if (jsonDecode(data1!)['data'] != null) {
+      newtable = List.from(jsonDecode(data1!)['data']);
+    }
+  }
+  return data1==null?Container():jsonDecode(data1!)['data']==null?Container():
+  Container(
+    margin:  const EdgeInsets.fromLTRB(10, 100, 10, 10),
+    child: SingleChildScrollView(
       scrollDirection: Axis.vertical,
       child: Column(
         children: [
@@ -609,71 +1191,65 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
             scrollDirection: Axis.horizontal,
             child: DataTable(
               headingRowColor: MaterialStateProperty.all(Colors.teal),
+             dataTextStyle: TextStyle(color: Colors.black,fontSize: 14),
+                columnSpacing: 30.0,
+              border: TableBorder.all(color: Colors.black),
               columns: [
-                const DataColumn(
+                DataColumn(
                     label: Center(
                         child: Text(
                   'Date',
                   style: TextStyle(color: Colors.white, fontSize: 18),
                 ))),
-                const DataColumn(
+                DataColumn(
                     label: Center(
-                        child: Text('Monday',
+                        child: Text('Task',
                             style:
                                 TextStyle(color: Colors.white, fontSize: 18)))),
-                const DataColumn(
+                // DataColumn(
+                //     label: Center(
+                //         child: Text('Time',
+                //             style:
+                //                 TextStyle(color: Colors.white, fontSize: 18)))),
+                DataColumn(
                     label: Center(
-                        child: Text('Tuesday',
+                        child: Text('Status',
                             style:
                                 TextStyle(color: Colors.white, fontSize: 18)))),
-                const DataColumn(
-                    label: Center(
-                        child: Text('Wednesday',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 18)))),
-                const DataColumn(
-                    label: Center(
-                        child: Text('Thrusday',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 18)))),
-                const DataColumn(
-                    label: Center(
-                        child: Text('Friday',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 18)))),
-                const DataColumn(
-                    label: Center(
-                        child: Text('Saturday',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 18)))),
-              ],
+                      ],
               rows:
-                  listOfColumns // Loops through dataColumnText, each iteration assigning the value to element
+              newtable // Loops through dataColumnText, each iteration assigning the value to element
                       .map(
                         ((element) => DataRow(
                               cells: <DataCell>[
-                                DataCell(Text(
-                                  element["Date"]!,
-                                  style: const TextStyle(color: Colors.black),
-                                )), //Extracting from Map element the value
-                                DataCell(Text(element["Task"]!,
-                                    style:
-                                        const TextStyle(color: Colors.black))),
-                                DataCell(Text(element["Number"]!,
-                                    style:
-                                        const TextStyle(color: Colors.black))),
-                                DataCell(Text(element["Number"]!,
-                                    style:
-                                        const TextStyle(color: Colors.black))),
-                                DataCell(Text(element["Number"]!,
-                                    style:
-                                        const TextStyle(color: Colors.black))),
-                                DataCell(Text(element["Number"]!,
-                                    style:
-                                        const TextStyle(color: Colors.black))),
-                                DataCell(Text(element["Number"]!,
-                                    style:
-                                        const TextStyle(color: Colors.black))),
+                                 //Extracting from Map element the value
+                                DataCell(Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text("${element["star_date"]!} - ${element["end_date"]!}",
+                                      style:
+                                          const TextStyle(color: Colors.black)),
+                                )),
+                                DataCell(Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    child: Text(element["description"]!,
+                                        style:
+                                            const TextStyle(color: Colors.black)),
+                                  ),
+                                )),
+                                // DataCell(Padding(
+                                //   padding: const EdgeInsets.all(8.0),
+                                //   child: Text("${element["star_date"]!} - ${element["end_date"]!}",
+                                //       style:
+                                //           const TextStyle(color: Colors.black)),
+                                // )),
+                                DataCell(Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(element["state"]!,
+                                      style:
+                                          const TextStyle(color: Colors.black)),
+                                )),
+
                               ],
                             )),
                       )
@@ -682,6 +1258,63 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
 }
+}
+
+
+// Widget filtertime(BuildContext context) {
+//   return Container(
+//       margin: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+//       child: Row(
+//         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//         children: [
+//           const Text(
+//             "From",
+//             style: TextStyle(fontSize: 18, color: Colors.black),
+//           ),
+//           SizedBox(
+//             width: 100,
+//             child: TextFormField(
+//               controller: fromcontroller,
+//               onChanged: (value) {},
+//               maxLength: 7,
+//             ),
+//           ),
+//           const Text(
+//             "To",
+//             style: TextStyle(fontSize: 18, color: Colors.black),
+//           ),
+//           SizedBox(
+//             width: 100,
+//             child: TextFormField(
+//               controller: tocontroller,
+//               onChanged: (value) {},
+//               maxLength: 7,
+//             ),
+//           ),
+//           GestureDetector(
+//             onTap: () {},
+//             child: Align(
+//                 alignment: Alignment.centerRight,
+//                 child: Container(
+//                     width: 24,
+//                     height: 24,
+//                     padding: const EdgeInsets.all(2),
+//                     decoration: BoxDecoration(
+//                         color: Colors.white,
+//                         border: Border.all(
+//                           color: Colors.grey,
+//                         ),
+//                         borderRadius: BorderRadius.circular(5)),
+//                     child: Image.asset(
+//                       "assets/images/filter.png",
+//                       height: 30,
+//                       color: Colors.grey,
+//                     ))),
+//           ),
+//         ],
+//       ));
+// }
+
