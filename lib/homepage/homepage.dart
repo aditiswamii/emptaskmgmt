@@ -12,6 +12,7 @@ import 'dart:convert' as convert;
 
 import '../utils/stringconstant.dart';
 
+
 class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
 
@@ -27,6 +28,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   var staffid;
   var datacoun;
   var filtername;
+  var filtershort;
   var data;
   var filterdata;
   var snackBar;
@@ -37,7 +39,8 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   var taskdata;
   bool dateclick=false;
   int filterid=0;
-  List<String> filterenum = ["This week", "Next week", "Today", "Tomorrow"];
+  List<String> filterenum = ["Month", "Week", "Today"];
+  // List<String> filterename = ["TW", "NW", "Today", ""];
   List<int> filterenumid = [1, 2, 3, 4];
 
   DateTime currentDate = DateTime.now();
@@ -152,7 +155,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         // var venam = jsonDecode(datacoun!)[0]['emp_name'].toString();
         // var venamid = jsonDecode(datacoun!)[0]['id'].toString();
        log(jsonDecode(datacoun!).toString());
-        log(jsonDecode(datacoun!)['data'][0]['department']['department_name'].toString());
+        log(jsonDecode(datacoun!)['data'][0]['departmentdata']['department_name'].toString());
       } else {}
     } else {
       if (kDebugMode) {
@@ -209,9 +212,14 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         log(jsonDecode(currentmnthdata!)['data'][0]['star_date'].toString());
         log(jsonDecode(currentmnthdata!)['data'][0]['end_date'].toString());
       } else {
+        setState(() {
+          currentmnthdata = response.body;
+
+          jsonDecode(currentmnthdata!);
+        });
         snackBar = SnackBar(
           content: Text(
-              jsonResponse['message']),
+              jsonResponse['message'],textAlign: TextAlign.center,),
         );
         ScaffoldMessenger.of(context)
             .showSnackBar(snackBar);
@@ -247,9 +255,14 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         log(jsonDecode(currentweekdata!)['data'][0]['star_date'].toString());
         log(jsonDecode(currentweekdata!)['data'][0]['end_date'].toString());
       } else {
+        setState(() {
+          currentweekdata = response.body;
+
+          jsonDecode(currentweekdata!);
+        });
         snackBar = SnackBar(
           content: Text(
-              jsonResponse['message']),
+              jsonResponse['message'],textAlign: TextAlign.center,),
         );
         ScaffoldMessenger.of(context)
             .showSnackBar(snackBar);
@@ -285,9 +298,14 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
         log(jsonDecode(currenttaskdata!)['data'][0]['star_date'].toString());
         log(jsonDecode(currenttaskdata!)['data'][0]['end_date'].toString());
       } else {
+        setState(() {
+          currenttaskdata = response.body;
+
+          jsonDecode(currenttaskdata!);
+        });
         snackBar = SnackBar(
           content: Text(
-              jsonResponse['message']),
+              jsonResponse['message'],textAlign: TextAlign.center,),
         );
         ScaffoldMessenger.of(context)
             .showSnackBar(snackBar);
@@ -327,7 +345,7 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
       } else {
         snackBar = SnackBar(
           content: Text(
-              jsonResponse['message']),
+              jsonResponse['message'],textAlign: TextAlign.center,),
         );
         ScaffoldMessenger.of(context)
             .showSnackBar(snackBar);
@@ -384,15 +402,16 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          toolbarHeight: 70,
+          toolbarHeight: 50,
           backgroundColor: Colors.teal,
-          title: const Text("Employee Task\nManagement",style: TextStyle(fontSize: 22),),
+          title: const Text("Employee Task\nManagement",style: TextStyle(fontSize: 18),),
           actions: [
             GestureDetector(
               onTap: () {},
               child: Container(
-                  height: 32,
-                  width: 32,
+                  margin: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                  height: 28,
+                  width: 28,
                   alignment: Alignment.centerRight,
                   child: Center(
                       child: Image.asset(
@@ -409,9 +428,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
               alignment: Alignment.topLeft,
               child: Container(
                 padding: const EdgeInsets.all(8),
-                color: Colors.teal.shade100,
+                color:Color(0xFFeeeeee),
                 // alignment: Alignment.topCenter,
-                height: 100,
+                height: 50,
                 child:  Column(
                   children: [
                     SizedBox(
@@ -420,205 +439,125 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       child: Row(
                         // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          SizedBox(
-                              width: (MediaQuery.of(context).size.width - 20)/7,
-                              child: const Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    "Staff",
-                                    style: TextStyle(
-                                        fontSize: 18, color: Colors.black),
-                                  ))),
+
                           stafflist(context),
-                          GestureDetector(
-                            onTap: () {
-                              AlertDialog errorDialog = AlertDialog(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                        20.0)), //this right here
-                                title: Container(
-                                  // height: MediaQuery.of(context).size.height-300,
-                                  width: 100,
-                                  padding: const EdgeInsets.all(8),
-                                  alignment: Alignment.center,
-                                  child: ListView.builder(
-                                      physics: const ClampingScrollPhysics(
-                                          parent: BouncingScrollPhysics()),
-                                      shrinkWrap: true,
-                                      itemCount: filterenum.length,
-                                      itemBuilder:
-                                          (BuildContext context, int index) {
-                                        return Column(
-                                          children: [
-                                            Container(
-                                              //height: 50,
-                                              padding: const EdgeInsets.all(4),
-                                              child: GestureDetector(
-                                                onTap: () {
-                                                  setState(() {
-                                                    filtername = filterenum[index];
-                                                    filterid = filterenumid[index];
-
-                                                    if(staffid!=null){
-                                                      if(filterid==0){
-                                                        getcurrentmonth(
-                                                            "$staffid");
-                                                      }else if(filterid==1){
-                                                        getcurrentweek(
-                                                            "$staffid");
-                                                      }else if(filterid==3){
-                                                        getcurrenttask("$staffid");
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                                color: Colors.black12, borderRadius: BorderRadius.circular(5)),
+                            child: GestureDetector(
+                              onTap: () {
+                                AlertDialog errorDialog = AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          20.0)), //this right here
+                                  title: Container(
+                                    // height: MediaQuery.of(context).size.height-300,
+                                    width: 100,
+                                    padding: const EdgeInsets.all(8),
+                                    alignment: Alignment.center,
+                                    child: ListView.builder(
+                                        physics: const ClampingScrollPhysics(
+                                            parent: BouncingScrollPhysics()),
+                                        shrinkWrap: true,
+                                        itemCount: filterenum.length,
+                                        itemBuilder:
+                                            (BuildContext context, int index) {
+                                          return Column(
+                                            children: [
+                                              Container(
+                                                //height: 50,
+                                                padding: const EdgeInsets.all(4),
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      filtername = filterenum[index];
+                                                      filterid = filterenumid[index];
+                                                      //filtershort=filterename[index];
+                                                      if(staffid!=null){
+                                                        if(filterid==0){
+                                                          getcurrentmonth(
+                                                              "$staffid");
+                                                        }else if(filterid==1){
+                                                          getcurrentweek(
+                                                              "$staffid");
+                                                        }else if(filterid==2){
+                                                          getcurrenttask("$staffid");
+                                                        }
                                                       }
-                                                    }
-                                                    Navigator.pop(context);
+                                                      Navigator.pop(context);
 
-                                                  });
+                                                    });
 
-                                                },
-                                                child: Text(
-                                                  filterenum[index],
-                                                  style: const TextStyle(
-                                                      fontSize: 18,
-                                                      color: Colors.black),
+                                                  },
+                                                  child: Text(
+                                                    filterenum[index],
+                                                    style: const TextStyle(
+                                                        fontSize: 18,
+                                                        color: Colors.black),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                            const Divider(
-                                              color: Colors.black12,
-                                            )
-                                          ],
-                                        );
-                                      }),
-                                ),
-                              );
-                              showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) => errorDialog);
-                            },
-                            child: SizedBox(
-                                width: (MediaQuery.of(context).size.width - 20) *3/ 7,
-                                child: Center(
-                                  child: Align(
-                                      alignment: Alignment.center,
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          const Padding(
-                                              padding: EdgeInsets.all(2),
-                                              child: Text("Filter",style: TextStyle(fontSize: 18),)),
-                                          Container(
-                                              width: 24,
-                                              height: 24,
-                                              padding: const EdgeInsets.all(2),
-                                              decoration: BoxDecoration(
-                                                  color: Colors.teal.shade100,
-                                                  border: Border.all(
-                                                    color: Colors.grey,
-                                                  ),
-                                                  borderRadius: BorderRadius.circular(5)),
-                                              child: Image.asset(
-                                                "assets/images/filter.png",
-                                                height: 30,
-                                                color: Colors.grey,
-                                              )),
-
-
-                                        ],
-                                      ),
+                                              const Divider(
+                                                color: Colors.black12,
+                                              )
+                                            ],
+                                          );
+                                        }),
                                   ),
-                                )),
+                                );
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) => errorDialog);
+                              },
+                              child: SizedBox(
+                                  width: (MediaQuery.of(context).size.width - 20) *1/ 4,
+                                  child:  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: filtername==null
+                                            ? const Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text("Month",
+                                              style:
+                                              TextStyle(color: Colors.black, fontSize: 14)),
+                                        )
+                                            : Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(filtername.toString(),
+                                              style: const TextStyle(
+                                                  color: Colors.black, fontSize: 12)),
+                                        ),
+                                      ),
+                                      // const Icon(
+                                      //   Icons.arrow_drop_down_outlined,
+                                      //   size: 22,
+                                      // )
+                                    ],
+                                  ),
+                              ),
+                            ),
                           ),
-                          // GestureDetector(
-                          //   onTap: (){
-                          //           // if(staffid!=null){
-                          //           //   if(filterid==0){
-                          //           //     getcurrentmonth();
-                          //           //   }else if(filterid==1){
-                          //           //     getcurrentweek(staffid);
-                          //           //   }
-                          //           // }else{
-                          //           //   snackBar = SnackBar(
-                          //           //     content: Text("Please select staff"),
-                          //           //   );
-                          //           //   ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                          //           // }
-                          //   },
-                          //   child: Container(
-                          //     width: (MediaQuery.of(context).size.width - 20) / 7,
-                          //     child: Align(
-                          //       alignment: Alignment.centerRight,
-                          //       child: Container(
-                          //         width: 24,
-                          //         height: 24,
-                          //         decoration: BoxDecoration(
-                          //             color: Colors.teal.shade100,
-                          //             border: Border.all(
-                          //               color: Colors.grey,
-                          //             ),
-                          //             borderRadius: BorderRadius.circular(5)),
-                          //
-                          //         child: Center(
-                          //           child: Image.asset(
-                          //             "assets/images/right_arrow.png",height: 20,width: 20,
-                          //
-                          //           ),
-                          //         ),
-                          //       ),
-                          //     ),
-                          //   ),
-                          // ),
 
                         ],
                       ),
                     ),
-                    // Container(
-                    //   //width: (MediaQuery.of(context).size.width - 20) / 6,
-                    //   alignment: Alignment.centerRight,
-                    //   child: ElevatedButton(
-                    //     style: ElevatedButton.styleFrom(
-                    //       primary: Colors.white,
-                    //       onPrimary: Colors.white,
-                    //       elevation: 3,
-                    //       alignment: Alignment.center,
-                    //       shape: RoundedRectangleBorder(
-                    //           borderRadius: BorderRadius.circular(30.0)),
-                    //       fixedSize: const Size(100, 30),
-                    //       //////// HERE
-                    //     ),
-                    //     onPressed: () {
-                    //       if(staffid!=null){
-                    //
-                    //       }else{
-                    //         snackBar = SnackBar(
-                    //           content: Text("Please select staff"),
-                    //         );
-                    //         ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                    //       }
-                    //
-                    //       // _presenter.login(emailController.text.toString(),
-                    //       //     passwordController.text.toString());
-                    //     },
-                    //     child: const Text(
-                    //       "Search",
-                    //       style: TextStyle(color: Colors.teal,
-                    //           fontSize: 16),
-                    //       textAlign: TextAlign.center,
-                    //     ),
-                    //   ),
-                    // ),
 
                   ],
                 ),
               ),
             ),
             if(filterid==0)
-              datatable(context,currentmnthdata),
+              table(context,currentmnthdata),
 
             if(filterid==1)
-              datatable(context,currentweekdata),
+              table(context,currentweekdata),
 
             if(filterid==3)
-              datatable(context,currenttaskdata),
+              table(context,currenttaskdata),
 
           // if(filterid==0)
           //     currentmnth(),
@@ -647,9 +586,9 @@ class HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Widget stafflist(BuildContext context) {
     return Container(
-        margin: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-        height: 50,
-        width: (MediaQuery.of(context).size.width - 20) * 3 / 7,
+        margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+       // height: 50,
+        width: ((MediaQuery.of(context).size.width - 20) * 3/4)-10,
         alignment: Alignment.centerLeft,
         //color: Colors.white,
         decoration: BoxDecoration(
@@ -1189,76 +1128,242 @@ Widget datatable(BuildContext context,data1) {
         children: [
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            child: DataTable(
-              headingRowColor: MaterialStateProperty.all(Colors.teal),
-             dataTextStyle: TextStyle(color: Colors.black,fontSize: 14),
-                columnSpacing: 30.0,
-              border: TableBorder.all(color: Colors.black),
-              columns: [
-                DataColumn(
-                    label: Center(
-                        child: Text(
-                  'Date',
-                  style: TextStyle(color: Colors.white, fontSize: 18),
-                ))),
-                DataColumn(
-                    label: Center(
-                        child: Text('Task',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 18)))),
-                // DataColumn(
-                //     label: Center(
-                //         child: Text('Time',
-                //             style:
-                //                 TextStyle(color: Colors.white, fontSize: 18)))),
-                DataColumn(
-                    label: Center(
-                        child: Text('Status',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 18)))),
-                      ],
-              rows:
-              newtable // Loops through dataColumnText, each iteration assigning the value to element
-                      .map(
-                        ((element) => DataRow(
-                              cells: <DataCell>[
-                                 //Extracting from Map element the value
-                                DataCell(Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text("${element["star_date"]!} - ${element["end_date"]!}",
-                                      style:
-                                          const TextStyle(color: Colors.black)),
-                                )),
-                                DataCell(Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
-                                    child: Text(element["description"]!,
+            child: Container(
+              width: 400,
+              child: DataTable(
+                headingRowColor: MaterialStateProperty.all(Colors.teal),
+               dataTextStyle: TextStyle(color: Colors.black,fontSize: 14),
+                  columnSpacing: 30.0,
+                dataRowHeight: 200,
+                border: TableBorder.all(color: Colors.black),
+                columns: [
+                  DataColumn(
+                      label: Center(
+                          child: Text(
+                    'Date',
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ))),
+                  DataColumn(
+                      label: Center(
+                          child: Text('Task',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 18)))),
+                  // DataColumn(
+                  //     label: Center(
+                  //         child: Text('Time',
+                  //             style:
+                  //                 TextStyle(color: Colors.white, fontSize: 18)))),
+                  DataColumn(
+                      label: Center(
+                          child: Text('Status',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 18)))),
+                        ],
+                rows:
+                newtable // Loops through dataColumnText, each iteration assigning the value to element
+                        .map(
+                          ((element) => DataRow(
+                                cells: <DataCell>[
+                                   //Extracting from Map element the value
+                                  DataCell(Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text("${element["star_date"]!}",
                                         style:
                                             const TextStyle(color: Colors.black)),
-                                  ),
-                                )),
-                                // DataCell(Padding(
-                                //   padding: const EdgeInsets.all(8.0),
-                                //   child: Text("${element["star_date"]!} - ${element["end_date"]!}",
-                                //       style:
-                                //           const TextStyle(color: Colors.black)),
-                                // )),
-                                DataCell(Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(element["state"]!,
-                                      style:
-                                          const TextStyle(color: Colors.black)),
-                                )),
+                                  )),
+                                  DataCell(Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Wrap(
 
-                              ],
-                            )),
-                      )
-                      .toList(),
+                                      children: [
+                                        // Text("${element["description"]!}${element["description"]!}",
+                                        //     style:
+                                        //         const TextStyle(color: Colors.black)),
+                                        Text("${element["description"]!}",
+                                            style:
+                                            const TextStyle(color: Colors.black)),
+                                      ],
+                                    ),
+                                  )),
+                                  // DataCell(Padding(
+                                  //   padding: const EdgeInsets.all(8.0),
+                                  //   child: Text("${element["star_date"]!} - ${element["end_date"]!}",
+                                  //       style:
+                                  //           const TextStyle(color: Colors.black)),
+                                  // )),
+                                  DataCell(Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(element["state"]!,
+                                        style:
+                                            const TextStyle(color: Colors.black)),
+                                  )),
+
+                                ],
+                              )),
+                        )
+                        .toList(),
+              ),
             ),
           ),
         ],
       ),
     ),
+  );
+}
+Widget table(BuildContext context,data1){
+  if(data1!=null) {
+    if (jsonDecode(data1!)['data'] != null) {
+        newtable = List.from(jsonDecode(data1!)['data']);
+    }else{
+
+        newtable=[];
+
+    }
+  }else{
+
+
+  }
+  return data1==null?Container(
+   ):newtable.isEmpty?Container():
+  Container(
+    margin:  const EdgeInsets.fromLTRB(10, 50, 10, 10),
+    child: SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: Column(
+        children: [
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Container(
+              width: 400,
+                child: Column(
+                  children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.teal,
+                              border: Border.all(color: Colors.black)
+                          ),
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                             children: [
+                               Container(
+                                   width: 98,
+                                 child: Padding(
+                                   padding: const EdgeInsets.all(8.0),
+                                   child: Center(
+                                      child: Text(
+                                        'Date',
+                                        style: TextStyle(color: Colors.white, fontSize: 18),
+                                      )),
+                                 ),
+                               ),
+                              Container(
+                                width: 148,
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                      right: BorderSide(color: Colors.black),  left: BorderSide(color: Colors.black)
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Center(
+                                      child: Text(
+                                        'Task',
+                                        style: TextStyle(color: Colors.white, fontSize: 18),
+                                      )),
+                                ),
+                              ),
+                              Container(
+
+                                width: 98,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Center(
+                                      child: Text(
+                                        'Status',
+                                        style: TextStyle(color: Colors.white, fontSize: 18),
+                                      )),
+                                ),
+                              )]
+                          ),
+                        ),
+
+
+                    newtable.isEmpty?Container(): ListView.builder(
+  physics:
+  const ClampingScrollPhysics(),
+  shrinkWrap: true,
+  itemCount: newtable.length,
+  itemBuilder: (BuildContext context,
+  int index) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+            right: BorderSide(color: Colors.black),  left: BorderSide(color: Colors.black),
+          bottom: BorderSide(color: Colors.black),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+           Container(
+             width: 98,
+
+             child: Padding(
+               padding: const EdgeInsets.all(8.0),
+               child: Center(
+                 child: Text("${newtable[index]["star_date"]!}",
+                     style:
+                     const TextStyle(color: Colors.black)),
+               ),
+             ),
+           ),
+            Container(
+              width: 148,
+              decoration: BoxDecoration(
+                  border: Border(
+                    left: BorderSide(color: Colors.black),right: BorderSide(color: Colors.black),
+                  ),
+
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                  child: Text("${newtable[index]["description"]!}",
+                      style:
+                      const TextStyle(color: Colors.black)),
+                ),
+              ),
+            ),
+
+            Container(
+              width: 98,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                  child: Text(newtable[index]["state"]!,
+                      style:
+                      const TextStyle(color: Colors.black)),
+                ),
+              ),
+            ),
+          ],
+      ),
+    );
+  }
+  )
+                      ],
+                    ),
+
+
+
+                )
+
+              ),
+      ]
+            ),
+          ),
+
+
   );
 }
 }

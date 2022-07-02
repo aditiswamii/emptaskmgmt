@@ -38,6 +38,7 @@ dependencies:
   shared_preferences:
   bidirectional_listview: ^1.0.3
   infinite_listview:
+  rxdart:
 
 
 dev_dependencies:
